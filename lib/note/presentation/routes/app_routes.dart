@@ -18,7 +18,7 @@ class AppRoutes {
           getIt(),
           getIt(),
           getNoteByStatus: getIt(),
-          updateNote: getIt(),
+          updateNoteUseCase: getIt(),
         ));
       })
     ),

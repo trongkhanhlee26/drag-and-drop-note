@@ -9,12 +9,12 @@ import 'package:get/get.dart';
 class NoteController extends GetxController{
 
   final GetNoteByStatusUseCase getNoteByStatus;
-  final UpdateNoteUseCase updateNote;
+  final UpdateNoteUseCase updateNoteUseCase;
   final InsertNoteUseCase insertNoteUseCase;
   final DeleteNoteUseCase deleteNoteUseCase;
   final GetNoteByIdUseCase getNoteByIdUseCase;
 
-  NoteController(this.insertNoteUseCase, this.deleteNoteUseCase, this.getNoteByIdUseCase, {required this.getNoteByStatus, required this.updateNote});
+  NoteController(this.insertNoteUseCase, this.deleteNoteUseCase, this.getNoteByIdUseCase, {required this.getNoteByStatus, required this.updateNoteUseCase});
 
   final RxList<NoteEntity> toDoNotes = <NoteEntity>[].obs;
   final RxList<NoteEntity> doingNotes = <NoteEntity>[].obs;
@@ -40,21 +40,20 @@ class NoteController extends GetxController{
     return await getNoteByIdUseCase(params: id);
   }
   Future<void> updateNoteStatus(NoteEntity note, String newStatus) async {
-    final updated = note.copyWith(
-    status: newStatus,
-    updatedAt: DateTime.now(),
-  );
-  await updateNote(params: updated);
+    final updatedStatus = note.copyWith(
+      status: newStatus
+    );
+    await getNoteByStatus(params: updatedStatus.status);
 
-  // Xóa khỏi list cũ
-  toDoNotes.remove(note);
-  doingNotes.remove(note);
-  doneNotes.remove(note);
+    // Xóa khỏi list cũ
+    toDoNotes.remove(note);
+    doingNotes.remove(note);
+    doneNotes.remove(note);
 
-  // Thêm vào list mới
-  if (newStatus == 'to_do') toDoNotes.add(updated);
-  if (newStatus == 'doing') doingNotes.add(updated);
-  if (newStatus == 'done') doneNotes.add(updated);
+    // Thêm vào list mới
+    if (newStatus == 'to_do') toDoNotes.add(updatedStatus);
+    if (newStatus == 'doing') doingNotes.add(updatedStatus);
+    if (newStatus == 'done') doneNotes.add(updatedStatus);
   }
 
   Future<void> insertNote({required String title, required String content}) async {
@@ -72,6 +71,16 @@ class NoteController extends GetxController{
 
   Future<void> deleteNote(NoteEntity note) async {
     await deleteNoteUseCase(params: note);
+    await loadNotes();
+  }
+
+  Future<void> updateNote(NoteEntity note, String title, String content) async {
+    final updatedNote = note.copyWith(
+    title: title,
+    content: content,
+    updatedAt: DateTime.now(),
+  );
+    await updateNoteUseCase(params: updatedNote);
     await loadNotes();
   }
 }

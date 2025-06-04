@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_drag_and_drop/note/domain/entities/note.dart';
 import 'package:flutter_application_drag_and_drop/note/presentation/controller/note_controller.dart';
+import 'package:flutter_application_drag_and_drop/note/presentation/widget/delete_note.dart';
+import 'package:flutter_application_drag_and_drop/note/presentation/widget/update_note.dart';
 import 'package:get/get.dart';
 
 class NoteDetailPage extends StatelessWidget {
@@ -32,85 +34,8 @@ class NoteDetailPage extends StatelessWidget {
             title: const Text('Note Detail'),
             leading: BackButton(),
             actions: [
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () async {
-                  final result = await showDialog<Map<String, String>>(
-                    context: context,
-                    builder: (context) {
-                      final titleController = TextEditingController(text: note.title);
-                      final contentController = TextEditingController(text: note.content);
-                      return AlertDialog(
-                        title: const Text('Edit Note'),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextField(
-                              controller: titleController,
-                              decoration: const InputDecoration(labelText: 'Title'),
-                            ),
-                            TextField(
-                              controller: contentController,
-                              decoration: const InputDecoration(labelText: 'Content'),
-                              maxLines: 3,
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('Cancel'),
-                          ),
-                          ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context, {
-                                'title': titleController.text,
-                                'content': contentController.text,
-                              });
-                            },
-                            child: const Text('Save'),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                  if (result != null) {
-                    final updatedNote = note.copyWith(
-                      title: result['title'],
-                      content: result['content'],
-                      updatedAt: DateTime.now(),
-                    );
-                    await controller.updateNote(params: updatedNote);
-                    Get.back();
-                  }
-                },
-              ),
-              IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () async {
-                  final confirm = await showDialog<bool>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: const Text('Delete Note'),
-                      content: const Text('Are you sure you want to delete this note?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context, false),
-                          child: const Text('Cancel'),
-                        ),
-                        ElevatedButton(
-                          onPressed: () => Navigator.pop(context, true),
-                          child: const Text('Delete'),
-                        ),
-                      ],
-                    ),
-                  );
-                  if (confirm == true) {
-                    await controller.deleteNote(note);
-                    Get.back();
-                  }
-                },
-              ),
+              UpdateNote(note: note),
+              DeleteNote(note: note),
             ],
           ),
           body: Padding(

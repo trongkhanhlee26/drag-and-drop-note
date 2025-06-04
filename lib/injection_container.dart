@@ -28,7 +28,7 @@ Future<void> initializeDependencies() async {
     getIt<DeleteNoteUseCase>(),
     getIt<GetNoteByIdUseCase>(),
     getNoteByStatus: getIt<GetNoteByStatusUseCase>(),
-    updateNote: getIt<UpdateNoteUseCase>(),
+    updateNoteUseCase: getIt<UpdateNoteUseCase>(),
   ));
   
 }
